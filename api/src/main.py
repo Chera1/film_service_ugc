@@ -2,6 +2,8 @@ import sys
 import os
 
 import uvicorn
+import sentry_sdk
+
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_jwt_auth import AuthJWT
@@ -13,6 +15,13 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from src.api.v1 import bookmark, like, review
 from src.core.config import settings
 from src.db import mongodb
+
+
+# Инициализируем Sentry SDK до инициализации FastAPI
+sentry_sdk.init(
+    dsn=settings.sentry_dsn,
+    traces_sample_rate=1.0,
+)
 
 # Создание FastAPI приложения
 app = FastAPI(

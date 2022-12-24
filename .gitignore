@@ -103,6 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+*.env
 .env
 .venv
 env/
@@ -132,4 +133,3 @@ dmypy.json
 
 .python-version
 
-event_writer_api/src/core/docker.env

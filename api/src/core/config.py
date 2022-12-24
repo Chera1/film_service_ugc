@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     # authjwt_secret_key должен совпадать с сервисом авторизации
     authjwt_secret_key: str = Field(..., env='SERVICE_SECRET_KEY')
 
+    sentry_dsn: str = Field(..., env='SENTRY_DSN')
+
     mongo_host: str = Field('localhost', env='MONGO_HOST')
     mongo_port: int = Field('5660', env='MONGO_PORT')
     mongo_user: str = Field(..., env='MONGO_USER')
