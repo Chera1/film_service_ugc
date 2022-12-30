@@ -1,11 +1,10 @@
 import uuid
 import datetime as dt
 
-from typing import Optional, Union, Tuple
 from bson.binary import Binary
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import Depends, Request, Query
+from fastapi import Depends
 
 from src.services.views import Views
 from src.db.mongodb import get_mongo

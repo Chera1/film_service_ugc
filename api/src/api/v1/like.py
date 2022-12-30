@@ -1,16 +1,13 @@
 import uuid
 
-from bson.binary import Binary
 from http import HTTPStatus
-from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import JWTDecodeError, MissingTokenError
 
 from src.services.like import FilmLikeService, get_film_like_service
-from src.models.models import FilmLikeAPI, FilmLike
+from src.utils.jwt import get_token
 
 
 # Объект router, в котором регистрируем обработчики
@@ -33,15 +30,7 @@ async def like_add(
     """
     Добавление лайка пользователя
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
 
     response = await film_like_service.add_film_like(
         user_id=token['user_uuid'],
@@ -72,16 +61,8 @@ async def like_delete(
     """
     Удаление лайка пользователя
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
+    token = get_token(authorize)
 
-    token = authorize.get_raw_jwt()
     response = await film_like_service.delete_film_like(
         user_id=token['user_uuid'],
         film_id=str(film_id),
@@ -111,16 +92,8 @@ async def like_update(
     """
     Обновление лайка пользователя
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
+    token = get_token(authorize)
 
-    token = authorize.get_raw_jwt()
     response = await film_like_service.update_film_like(
         user_id=token['user_uuid'],
         film_id=str(film_id),
@@ -143,22 +116,11 @@ async def like_update(
             )
 async def like_average(
         film_id: uuid.UUID,
-        token: HTTPAuthorizationCredentials = Depends(HTTPBearer(bearerFormat='Bearer')),
-        authorize: AuthJWT = Depends(),
         film_like_service: FilmLikeService = Depends(get_film_like_service)
     ) -> dict:
     """
     Подсчет среднего рейтинга для фильма
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-
     response = await film_like_service.average_film_likes(
         film_id=str(film_id),
     )
@@ -181,22 +143,11 @@ async def like_average(
             )
 async def like_summary(
         film_id: uuid.UUID,
-        token: HTTPAuthorizationCredentials = Depends(HTTPBearer(bearerFormat='Bearer')),
-        authorize: AuthJWT = Depends(),
         film_like_service: FilmLikeService = Depends(get_film_like_service)
     ) -> dict:
     """
     Информация по оценкам, поставленным фильму
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-
     response = await film_like_service.summary_film_likes(
         film_id=str(film_id),
     )

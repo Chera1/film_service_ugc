@@ -84,7 +84,6 @@ class MongoDB(AbstractDB):
             response: Список документов
         """
         expression = {}
-        print(sort)
         if user_id:
             expression["user_id"] = user_id
         documents = await self.mongo[settings.mongo_db][collection].find(

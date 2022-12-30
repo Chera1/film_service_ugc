@@ -1,16 +1,13 @@
 import uuid
 
-from bson.binary import Binary
 from http import HTTPStatus
-from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import JWTDecodeError, MissingTokenError
 
 from src.services.review import ReviewService, get_review_service
-from src.models.models import ReviewAPI, Review
+from src.utils.jwt import get_token
 
 
 # Объект router, в котором регистрируем обработчики
@@ -33,15 +30,7 @@ async def review_rating_add(
     """
     Добавление оценки к рецензии на фильм
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
 
     response = await review_like_service.add_like_to_review(
         user_id=token['user_uuid'],
@@ -73,15 +62,7 @@ async def review_add(
     """
     Добавление рецензии на фильм
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
 
     response = await review_like_service.add_review(
         user_id=token['user_uuid'],

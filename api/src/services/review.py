@@ -1,15 +1,14 @@
 import uuid
 import datetime as dt
 
-from typing import Optional, Union, Tuple
 from bson.binary import Binary
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import Depends, Request, Query
+from fastapi import Depends
 
 from src.services.views import Views
 from src.db.mongodb import get_mongo
-from src.models.models import ReviewAPI, Review, ReviewLikeAPI, ReviewLike
+from src.models.models import ReviewAPI, Review, ReviewLike
 from src.utils.abstract_db import AbstractDB, MongoDB
 from src.core.config import settings
 
@@ -75,14 +74,16 @@ class ReviewService(Views):
         @param limit: количество записей на странице
         @param page: номер страницы
         """
-        sort = sort.split('&')
         sort_string = []
 
-        for item in sort:
-            if item[0] == '-':
-                sort_string.append((item[1:], -1))
-            else:
-                sort_string.append((item, 1))
+        if sort:
+            sort = sort.split('&')
+
+            for item in sort:
+                if item[0] == '-':
+                    sort_string.append((item[1:], -1))
+                else:
+                    sort_string.append((item, 1))
 
         reviews = await self.get_records(
             collection=settings.mongo_reviews_collection,

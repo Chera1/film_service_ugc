@@ -1,15 +1,15 @@
 import uuid
 
 from http import HTTPStatus
-from typing import Optional, Union
+from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import JWTDecodeError, MissingTokenError
 
 from src.services.bookmark import BookMarkService, get_bookmark_service
-from src.models.models import Bookmark, BookmarkAPI
+from src.models.models import BookmarkAPI
+from src.utils.jwt import get_token
 
 
 # Объект router, в котором регистрируем обработчики
@@ -31,15 +31,7 @@ async def bookmark_add(
     """
     Добавление фильма в закладки пользователя
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
 
     response = await bookmark_service.add_bookmark(
         user_id=token['user_uuid'],
@@ -69,16 +61,7 @@ async def bookmark_delete(
     """
     Удаление фильма из закладок пользователя
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
     response = await bookmark_service.delete_bookmark(
         user_id=token['user_uuid'],
         film_id=str(film_id),
@@ -107,19 +90,10 @@ async def bookmarks_get(
     """
     Получение фильмов пользователя из закладок
     """
-    try:
-        authorize.jwt_required()
-    except JWTDecodeError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not valid or expired')
-    except MissingTokenError:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail='Token not found')
-    token = authorize.get_raw_jwt()
+    token = get_token(authorize)
 
     response = await bookmark_service.get_bookmarks(
         user_id=token['user_uuid'],
     )
-    print(response)
 
     return response
