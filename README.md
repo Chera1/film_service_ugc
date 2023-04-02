@@ -1,9 +1,10 @@
-# Проектная работа 9 спринта
+# User-generated content service
 
-Ссылка на репозиторий ugc2:
-https://github.com/san100791/ugc_sprint_2
+## UGC Api
 
-Ссылки на репозитории с сервисами async API и авторизации с добавлением логов:
-https://github.com/san100791/Async_API_sprint_1
-https://github.com/san100791/Auth_sprint_1
+[Documentation](event_writer_api/README.md)
 
+
+## UGC ETL Kafka to ClikHouse
+
+[Documentation](etl_kafka_to_clikhouse/README.md)
